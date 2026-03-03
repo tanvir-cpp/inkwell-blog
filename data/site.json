@@ -1,0 +1,17 @@
+{
+    "name": "InkWell",
+    "tagline": "Stories, Code & Creative Thinking",
+    "description": "A blog about web development, design, technology, and the creative life. Dive into tutorials, travel guides, productivity hacks, and curated resources.",
+    "author": "Tanvir Ahmed",
+    "url": "",
+    "social": {
+        "twitter": "#",
+        "github": "#",
+        "youtube": "#",
+        "rss": "#"
+    },
+    "newsletter": {
+        "title": "Stay in the Loop",
+        "description": "Get the latest articles, tutorials, and curated resources delivered straight to your inbox. No spam, ever."
+    }
+}
