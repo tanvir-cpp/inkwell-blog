@@ -568,7 +568,7 @@
         <div class="stat-card">
           <div class="stat-card-header">
             <span>Total Posts</span>
-            <div class="stat-icon" style="background:rgba(225,0,90,0.1);color:var(--admin-pink);">
+            <div class="stat-icon" style="background:rgba(234,63,69,0.1);color:var(--admin-brand);">
               <i data-lucide="file-text" style="width:18px;height:18px;"></i>
             </div>
           </div>
@@ -933,7 +933,7 @@
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => `<pre><code>${escapeHtmlAdmin(code.trim())}</code></pre>`);
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
             html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:8px;">');
-            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:var(--admin-teal);">$1</a>');
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:var(--admin-primary);">$1</a>');
             html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
             html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');

@@ -5,26 +5,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --admin-bg: #0f1117;
-    --admin-surface: #1a1d27;
-    --admin-surface-2: #222536;
-    --admin-surface-3: #2a2e42;
-    --admin-border: #2e3348;
-    --admin-border-light: #3a3f55;
-    --admin-text: #e4e5eb;
-    --admin-text-secondary: #8b8fa3;
-    --admin-text-muted: #5e6278;
-    --admin-pink: #e1005a;
-    --admin-pink-light: #ff4d8d;
-    --admin-teal: #00aeb9;
+    --admin-bg: #f8fafc;
+    --admin-surface: #ffffff;
+    --admin-surface-2: #f1f5f9;
+    --admin-surface-3: #e2e8f0;
+    --admin-border: #e2e8f0;
+    --admin-border-light: #cbd5e1;
+    --admin-text: #0f172a;
+    --admin-text-secondary: #334155;
+    --admin-text-muted: #64748b;
+    --admin-brand: #ea3f45;
+    /* Clean Tofugu-like red */
+    --admin-brand-light: #ff6066;
+    --admin-brand-dark: #cc2f35;
+    --admin-primary: #3b82f6;
+    /* Blue for primary actions */
     --admin-green: #10b981;
     --admin-yellow: #f59e0b;
     --admin-red: #ef4444;
     --admin-blue: #3b82f6;
     --admin-purple: #8b5cf6;
-    --admin-radius: 8px;
-    --admin-radius-lg: 12px;
-    --admin-transition: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --admin-radius: 6px;
+    --admin-radius-lg: 10px;
+    --admin-transition: ease-in-out;
+    --admin-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --admin-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 * {
@@ -47,31 +52,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #0f1117 0%, #1a1d27 50%, #0f1117 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-.login-screen::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(225, 0, 90, 0.08), transparent 70%);
-    top: -200px;
-    right: -200px;
-}
-
-.login-screen::after {
-    content: '';
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 174, 185, 0.06), transparent 70%);
-    bottom: -150px;
-    left: -150px;
+    background: var(--admin-bg);
 }
 
 .login-card {
@@ -80,7 +61,7 @@ body {
     background: var(--admin-surface);
     border: 1px solid var(--admin-border);
     border-radius: var(--admin-radius-lg);
-    position: relative;
+    box-shadow: var(--admin-shadow);
     z-index: 1;
 }
 
@@ -91,11 +72,8 @@ body {
 
 .login-logo h1 {
     font-size: 1.8rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--admin-pink), var(--admin-teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 700;
+    color: var(--admin-text);
     margin-bottom: 0.25rem;
 }
 
@@ -132,8 +110,8 @@ body {
 }
 
 .form-input:focus {
-    border-color: var(--admin-pink);
-    box-shadow: 0 0 0 3px rgba(225, 0, 90, 0.15);
+    border-color: var(--admin-brand);
+    box-shadow: 0 0 0 3px rgba(234, 63, 69, 0.15);
 }
 
 .form-input::placeholder {
@@ -156,7 +134,7 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--admin-pink), var(--admin-pink-light));
+    background: linear-gradient(135deg, var(--admin-brand), var(--admin-brand-light));
     color: white;
 }
 
@@ -166,7 +144,7 @@ body {
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(225, 0, 90, 0.4);
+    box-shadow: 0 6px 20px var(--admin-shadow-sm);
 }
 
 .btn-secondary {
@@ -273,11 +251,8 @@ body {
 
 .sidebar-header h2 {
     font-size: 1.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--admin-pink), var(--admin-teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 700;
+    color: var(--admin-text);
 }
 
 .sidebar-header p {
@@ -313,8 +288,8 @@ body {
 }
 
 .sidebar-link.active {
-    background: rgba(225, 0, 90, 0.1);
-    color: var(--admin-pink);
+    background: rgba(234, 63, 69, 0.1);
+    color: var(--admin-brand);
 }
 
 .sidebar-link i {
@@ -335,13 +310,14 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--admin-pink), var(--admin-teal));
+    background: var(--admin-surface-3);
+    border: 1px solid var(--admin-border);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.7rem;
     font-weight: 700;
-    color: white;
+    color: var(--admin-text);
     flex-shrink: 0;
 }
 
@@ -632,7 +608,7 @@ body {
 }
 
 .markdown-editor:focus {
-    border-color: var(--admin-pink);
+    border-color: var(--admin-brand);
 }
 
 /* Editor toolbar */
@@ -698,7 +674,7 @@ body {
 }
 
 .preview-toggle button.active {
-    background: var(--admin-pink);
+    background: var(--admin-brand);
     color: white;
 }
 
@@ -743,7 +719,7 @@ body {
     border-radius: 4px;
     font-family: monospace;
     font-size: 0.85em;
-    color: var(--admin-pink);
+    color: var(--admin-brand);
 }
 
 .markdown-preview pre {
@@ -773,11 +749,11 @@ body {
 }
 
 .markdown-preview blockquote {
-    border-left: 3px solid var(--admin-teal);
+    border-left: 3px solid var(--admin-primary);
     padding: 0.5rem 1rem;
     margin: 1rem 0;
     color: var(--admin-text-muted);
-    background: rgba(0, 174, 185, 0.05);
+    background: rgba(59, 130, 246, 0.05);
     border-radius: 0 var(--admin-radius) var(--admin-radius) 0;
 }
 
@@ -802,7 +778,7 @@ body {
 }
 
 .form-select:focus {
-    border-color: var(--admin-pink);
+    border-color: var(--admin-brand);
 }
 
 .tags-input-wrapper {

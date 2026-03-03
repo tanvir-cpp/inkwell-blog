@@ -69,9 +69,8 @@
     dom.heroSubtitle = document.getElementById('hero-subtitle');
   }
 
-  // ─── Load Data — Supabase first, fallback to JSON ───
+  // ─── Load Data — Supabase ───
   async function loadData() {
-    // Try Supabase first
     if (window.supabase && typeof supabase !== 'undefined') {
       try {
         const [postsRes, catsRes] = await Promise.all([
@@ -111,31 +110,11 @@
           state.categories = catsRes.data;
         }
       } catch (err) {
-        console.warn('Supabase load failed, falling back to JSON:', err);
+        console.warn('Supabase load failed:', err);
       }
+    } else {
+      console.error('Supabase client not found!');
     }
-
-    // Fallback to local JSON
-    if (!state.useSupabase) {
-      try {
-        const [postsRes, categoriesRes] = await Promise.all([
-          fetch('data/posts.json'),
-          fetch('data/categories.json'),
-        ]);
-        state.posts = await postsRes.json();
-        state.categories = await categoriesRes.json();
-        state.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-        console.log('📁 Loaded from local JSON:', state.posts.length, 'posts');
-      } catch (err) {
-        console.error('Failed to load data:', err);
-      }
-    }
-
-    // Load site config (always from JSON)
-    try {
-      const siteRes = await fetch('data/site.json');
-      state.siteConfig = await siteRes.json();
-    } catch (e) { /* ignore */ }
   }
 
   // ─── Event Listeners ───
