@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <!-- HEADER -->
   <header class="site-header" id="site-header">
@@ -27,11 +29,58 @@
 
   <main style="min-height: 60vh;">
     <div class="page-view" style="display: block;">
-      <div class="page-header" style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
-        <h1 class="page-title" style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em;">About Us</h1>
+      <div class="page-header"
+        style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
+        <h1 class="page-title"
+          style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em;">
+          About Us</h1>
       </div>
-      <article class="page-body post-body" style="max-width: var(--max-width-sm); margin: 0 auto; padding: 0 var(--space-xl);">
-        <p>Welcome to InkWell. We are a passionate team of writers, developers, and designers sharing our thoughts with the world. We believe in the power of stories, code, and creative thinking.</p>
+      <article class="page-body"
+        style="max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-xl) var(--space-4xl);">
+
+        <div
+          style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3xl); align-items: center; margin-bottom: var(--space-4xl);">
+          <div>
+            <img src="assets/images/mascot.png" alt="InkWell Mascot"
+              style="width: 100%; max-width: 400px; display: block; margin: 0 auto;">
+          </div>
+          <div>
+            <h2
+              style="font-family: var(--font-display); font-size: 2rem; color: var(--navy); margin-bottom: var(--space-md); text-transform: uppercase;">
+              The InkWell Story</h2>
+            <p style="font-size: 1.15rem; line-height: 1.8; color: var(--text); margin-bottom: var(--space-md);">
+              Welcome to InkWell. We are a passionate team of writers, developers, and designers sharing our thoughts
+              with the world. We believe in the power of stories, code, and creative thinking.
+            </p>
+            <p style="font-size: 1.15rem; line-height: 1.8; color: var(--text);">
+              What started as a small personal journal has evolved into a growing community of curious minds. Whether
+              you are looking to refactor your code, design your next masterpiece, or simply find the perfect book for
+              the weekend—you are in the right place.
+            </p>
+          </div>
+        </div>
+
+        <div
+          style="background: var(--white); padding: var(--space-3xl); border-radius: 8px; box-shadow: var(--shadow-sm); text-align: center;">
+          <div
+            style="width: 80px; height: 80px; border-radius: 50%; background: var(--off-white); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md); color: var(--navy); font-family: var(--font-display); font-size: 1.5rem;">
+            TA</div>
+          <h3
+            style="font-family: var(--font-display); font-size: 1.5rem; text-transform: uppercase; margin-bottom: var(--space-xs);">
+            Tanvir Ahmed</h3>
+          <p
+            style="color: var(--pink); font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-lg);">
+            Founder & Lead Editor</p>
+          <p style="max-width: 600px; margin: 0 auto var(--space-xl); color: var(--gray-600); line-height: 1.7;">
+            A developer and designer with a passion for creative expression. When not coding, you can find me reading a
+            good book or exploring new tech stacks.
+          </p>
+          <div style="display: flex; gap: var(--space-md); justify-content: center;">
+            <a href="#" style="color: var(--navy);"><i data-lucide="twitter" style="width: 20px; height: 20px;"></i></a>
+            <a href="#" style="color: var(--navy);"><i data-lucide="github" style="width: 20px; height: 20px;"></i></a>
+            <a href="#" style="color: var(--navy);"><i data-lucide="mail" style="width: 20px; height: 20px;"></i></a>
+          </div>
+        </div>
       </article>
     </div>
   </main>
@@ -48,8 +97,10 @@
       <div class="footer-column">
         <h3>Resources</h3>
         <ul>
-          <li><a href="book-reviews.html"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book Reviews</a></li>
-          <li><a href="productivity.html"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a></li>
+          <li><a href="book-reviews.html"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book
+              Reviews</a></li>
+          <li><a href="productivity.html"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a>
+          </li>
           <li><a href="featured.html"><i data-lucide="star" style="width:14px;height:14px;"></i> Featured</a></li>
           <li><a href="archive.html"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archive</a></li>
         </ul>
@@ -70,4 +121,5 @@
   </footer>
   <script>lucide.createIcons();</script>
 </body>
+
 </html>

@@ -295,6 +295,16 @@
                                     alt="Thumbnail preview">
                             </div>
 
+                            <!-- Media / Audio URL -->
+                            <div class="editor-card" id="media-url-card">
+                                <h3>Podcast / Audio URL</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Direct Audio URL or Spotify Embed</label>
+                                    <input type="text" class="form-input" id="editor-media-url"
+                                        placeholder="https://example.com/audio.mp3  OR Spotify iframe">
+                                </div>
+                            </div>
+
                             <!-- Excerpt -->
                             <div class="editor-card">
                                 <h3>Excerpt</h3>
@@ -690,8 +700,8 @@
             document.getElementById('editor-title').value = '';
             document.getElementById('editor-subtitle').value = '';
             document.getElementById('markdown-editor').value = '';
-            document.getElementById('editor-excerpt').value = '';
             document.getElementById('editor-thumbnail').value = '';
+            document.getElementById('editor-media-url').value = '';
             document.getElementById('editor-readtime').value = '';
             document.getElementById('editor-status').value = 'draft';
             document.getElementById('editor-date').value = new Date().toISOString().split('T')[0];
@@ -728,6 +738,7 @@
             document.getElementById('markdown-editor').value = post.content;
             document.getElementById('editor-excerpt').value = post.excerpt;
             document.getElementById('editor-thumbnail').value = post.thumbnail;
+            document.getElementById('editor-media-url').value = post.media_url || '';
             document.getElementById('editor-readtime').value = post.read_time;
             document.getElementById('editor-status').value = post.status;
             document.getElementById('editor-date').value = post.date;
@@ -784,6 +795,7 @@
                 category_id: document.getElementById('editor-category').value,
                 tags: adminState.editorTags,
                 thumbnail: document.getElementById('editor-thumbnail').value.trim(),
+                media_url: document.getElementById('editor-media-url').value.trim() || null,
                 read_time: document.getElementById('editor-readtime').value.trim() || '5 min read',
                 date: document.getElementById('editor-date').value,
                 status,

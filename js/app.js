@@ -102,6 +102,7 @@
             thumbnail: p.thumbnail,
             excerpt: p.excerpt,
             content: p.content,
+            mediaUrl: p.media_url,
             featured: p.featured,
             markdown: null, // Content stored directly in DB
           }));
@@ -267,6 +268,64 @@
     dom.postDate.textContent = formatDate(post.date);
     dom.postReadTime.textContent = post.readTime;
     dom.postAuthorAvatar.textContent = post.authorAvatar;
+
+    // Remove any existing media player
+    const existingPlayer = dom.postBody.parentNode.querySelector('.post-media-player');
+    if (existingPlayer) existingPlayer.remove();
+
+    // Render Audio / Media Player if present
+    if (post.mediaUrl) {
+      const playerWrapper = document.createElement('div');
+      playerWrapper.className = 'post-media-player';
+      playerWrapper.style.margin = '2rem auto';
+      playerWrapper.style.maxWidth = 'var(--max-width-sm)';
+      playerWrapper.style.padding = '0 var(--space-xl)';
+
+      // Check if it's a direct audio file or an embed
+      if (post.mediaUrl.match(/\.(mp3|wav|ogg)$/i)) {
+        playerWrapper.innerHTML = `
+          <div style="background: var(--off-white); padding: var(--space-xl); border-radius: 12px; border: 1px solid var(--gray-200);">
+              <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: var(--navy); margin-bottom: var(--space-md); display:flex; align-items:center; gap: 8px;">
+                 <i data-lucide="headphones" style="width:20px;height:20px;color:var(--pink);"></i> Listen to Episode
+              </h3>
+              <audio controls style="width: 100%; outline: none;">
+                  <source src="${post.mediaUrl}" type="audio/mpeg">
+                  Your browser does not support the audio element.
+              </audio>
+          </div>
+        `;
+      } else if (post.mediaUrl.includes('youtube.com') || post.mediaUrl.includes('youtu.be')) {
+        let youtubeId = '';
+        if (post.mediaUrl.includes('youtube.com/watch?v=')) {
+          youtubeId = post.mediaUrl.split('v=')[1].split('&')[0];
+        } else if (post.mediaUrl.includes('youtu.be/')) {
+          youtubeId = post.mediaUrl.split('youtu.be/')[1].split('?')[0];
+        } else if (post.mediaUrl.includes('youtube.com/embed/')) {
+          youtubeId = post.mediaUrl.split('youtube.com/embed/')[1].split('?')[0];
+        }
+
+        if (youtubeId) {
+          playerWrapper.innerHTML = `
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); position: relative; padding-bottom: 56.25%; height: 0;">
+              <iframe src="https://www.youtube.com/embed/${youtubeId}?rel=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          `;
+        }
+      } else if (post.mediaUrl.includes('spotify.com') || post.mediaUrl.includes('soundcloud.com')) {
+        // Assume it's an iframe embed if it contains common embed domains
+        playerWrapper.innerHTML = `
+          <div style="border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm);">
+            ${post.mediaUrl.startsWith('<iframe') ? post.mediaUrl : `<iframe src="${post.mediaUrl}" width="100%" height="232" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`}
+          </div>
+        `;
+      } else {
+        // Fallback simple link
+        playerWrapper.innerHTML = `<a href="${post.mediaUrl}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;"><i data-lucide="play-circle" style="width:16px;height:16px;"></i> Play Media External</a>`;
+      }
+
+      dom.postBody.parentNode.insertBefore(playerWrapper, dom.postBody);
+      lucide.createIcons();
+    }
 
     // Render content
     if (post.content) {

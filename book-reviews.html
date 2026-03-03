@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <!-- HEADER -->
   <header class="site-header" id="site-header">
@@ -26,13 +28,22 @@
   </header>
 
   <main style="min-height: 60vh;">
-    <div class="page-view" style="display: block;">
-      <div class="page-header" style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
-        <h1 class="page-title" style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em;">Book Reviews</h1>
+    <div class="page-view" style="display: block; max-width: var(--max-width); margin: 0 auto;">
+      <div class="page-header"
+        style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
+        <h1 class="page-title"
+          style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em; margin-bottom: var(--space-md);">
+          Book Reviews</h1>
+        <p style="color: var(--gray-600); font-size: 1.1rem;">Check out our latest reviews on programming, design, and
+          productivity books.</p>
       </div>
-      <article class="page-body post-body" style="max-width: var(--max-width-sm); margin: 0 auto; padding: 0 var(--space-xl);">
-        <p>Check out our latest reviews on programming, design, and productivity books.</p>
-      </article>
+
+      <div class="articles-section" style="padding: 0 var(--space-xl) var(--space-4xl);">
+        <div class="articles-grid" id="category-posts">
+          <!-- Loading State -->
+          <p style="text-align:center; color: var(--gray-500); grid-column: 1 / -1;">Loading reviews...</p>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -48,8 +59,10 @@
       <div class="footer-column">
         <h3>Resources</h3>
         <ul>
-          <li><a href="book-reviews.html"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book Reviews</a></li>
-          <li><a href="productivity.html"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a></li>
+          <li><a href="book-reviews.html"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book
+              Reviews</a></li>
+          <li><a href="productivity.html"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a>
+          </li>
           <li><a href="featured.html"><i data-lucide="star" style="width:14px;height:14px;"></i> Featured</a></li>
           <li><a href="archive.html"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archive</a></li>
         </ul>
@@ -69,5 +82,48 @@
     </div>
   </footer>
   <script>lucide.createIcons();</script>
+
+  <!-- Supabase & Data Fetching -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const grid = document.getElementById("category-posts");
+
+      try {
+        const { data: posts, error } = await supabase
+          .from('posts')
+          .select('*, categories(*)')
+          .eq('status', 'published')
+          .eq('category_id', 'book-reviews')
+          .order('date', { ascending: false });
+
+        if (error) throw error;
+
+        if (!posts || posts.length === 0) {
+          grid.innerHTML = '<p style="text-align:center; color: var(--gray-500); grid-column: 1 / -1; padding: 4rem 0;">No book reviews published yet. Check back soon!</p>';
+          return;
+        }
+
+        grid.innerHTML = posts.map(post => {
+          const date = new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          return `
+                <div class="article-card" onclick="window.location.href='index.html#post/${post.id}'" style="cursor: pointer;">
+                    <img class="article-card-image" src="${post.thumbnail}" alt="${post.title}" loading="lazy">
+                    <div class="article-card-content">
+                        <span class="category-badge" data-category="book-reviews" style="background: #ff5722;">Book Reviews</span>
+                        <h3 class="article-card-title">${post.title}</h3>
+                        <p class="article-card-subtitle">${post.excerpt || post.subtitle || ''}</p>
+                    </div>
+                </div>`;
+        }).join('');
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        grid.innerHTML = '<p style="text-align:center; color: var(--pink); grid-column: 1 / -1;">Failed to load reviews. Please try again later.</p>';
+      }
+    });
+  </script>
 </body>
+
 </html>

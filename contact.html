@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <!-- HEADER -->
   <header class="site-header" id="site-header">
@@ -27,11 +29,113 @@
 
   <main style="min-height: 60vh;">
     <div class="page-view" style="display: block;">
-      <div class="page-header" style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
-        <h1 class="page-title" style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em;">Contact</h1>
+      <div class="page-header"
+        style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
+        <h1 class="page-title"
+          style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em;">
+          Contact</h1>
       </div>
-      <article class="page-body post-body" style="max-width: var(--max-width-sm); margin: 0 auto; padding: 0 var(--space-xl);">
-        <p>Have a question or want to work with us? Drop us an email at <strong>hello@inkwellblog.com</strong>.</p>
+      <article class="page-body"
+        style="max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-xl) var(--space-4xl);">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4xl); align-items: start;">
+          <!-- Contact Info -->
+          <div>
+            <h2
+              style="font-family: var(--font-display); font-size: 2rem; color: var(--navy); margin-bottom: var(--space-md); text-transform: uppercase;">
+              Get in Touch</h2>
+            <p style="font-size: 1.15rem; line-height: 1.8; color: var(--text); margin-bottom: var(--space-2xl);">
+              Have a question, a project idea, or just want to say hello? We'd love to hear from you. Fill out the form
+              or reach out via email.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+              <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <div
+                  style="width: 48px; height: 48px; border-radius: 50%; background: rgba(225, 0, 90, 0.1); color: var(--pink); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="mail"></i>
+                </div>
+                <div>
+                  <h4
+                    style="font-family: var(--font-display); text-transform: uppercase; color: var(--navy); font-size: 1.1rem; margin-bottom: 2px;">
+                    Email Us</h4>
+                  <a href="mailto:hello@inkwellblog.com"
+                    style="color: var(--gray-600); text-decoration: none;">hello@inkwellblog.com</a>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <div
+                  style="width: 48px; height: 48px; border-radius: 50%; background: rgba(0, 174, 185, 0.1); color: var(--teal); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="map-pin"></i>
+                </div>
+                <div>
+                  <h4
+                    style="font-family: var(--font-display); text-transform: uppercase; color: var(--navy); font-size: 1.1rem; margin-bottom: 2px;">
+                    Studio HQ</h4>
+                  <p style="color: var(--gray-600);">123 Creative Studio, Digital World</p>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <div
+                  style="width: 48px; height: 48px; border-radius: 50%; background: rgba(139, 92, 246, 0.1); color: var(--cat-resources); display: flex; align-items: center; justify-content: center;">
+                  <i data-lucide="twitter"></i>
+                </div>
+                <div>
+                  <h4
+                    style="font-family: var(--font-display); text-transform: uppercase; color: var(--navy); font-size: 1.1rem; margin-bottom: 2px;">
+                    Twitter / X</h4>
+                  <a href="#" style="color: var(--gray-600); text-decoration: none;">@inkwellblog</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Form -->
+          <div
+            style="background: var(--white); padding: var(--space-2xl); border-radius: 8px; box-shadow: var(--shadow-md);">
+            <form onsubmit="event.preventDefault(); alert('Message sent successfully!');">
+              <div style="margin-bottom: var(--space-md);">
+                <label
+                  style="display: block; font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600; color: var(--navy); margin-bottom: var(--space-xs);">Name</label>
+                <input type="text" placeholder="Jane Doe"
+                  style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--gray-300); border-radius: 4px; font-family: var(--font-ui); font-size: 1rem;"
+                  required>
+              </div>
+
+              <div style="margin-bottom: var(--space-md);">
+                <label
+                  style="display: block; font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600; color: var(--navy); margin-bottom: var(--space-xs);">Email
+                  Address</label>
+                <input type="email" placeholder="jane@example.com"
+                  style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--gray-300); border-radius: 4px; font-family: var(--font-ui); font-size: 1rem;"
+                  required>
+              </div>
+
+              <div style="margin-bottom: var(--space-md);">
+                <label
+                  style="display: block; font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600; color: var(--navy); margin-bottom: var(--space-xs);">Subject</label>
+                <input type="text" placeholder="How can we help?"
+                  style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--gray-300); border-radius: 4px; font-family: var(--font-ui); font-size: 1rem;"
+                  required>
+              </div>
+
+              <div style="margin-bottom: var(--space-lg);">
+                <label
+                  style="display: block; font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600; color: var(--navy); margin-bottom: var(--space-xs);">Message</label>
+                <textarea rows="5" placeholder="Write your message here..."
+                  style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--gray-300); border-radius: 4px; font-family: var(--font-ui); font-size: 1rem; resize: vertical;"
+                  required></textarea>
+              </div>
+
+              <button type="submit"
+                style="background: var(--pink); color: var(--white); border: none; padding: 1rem 2rem; border-radius: 4px; font-family: var(--font-display); font-size: 1.1rem; text-transform: uppercase; cursor: pointer; width: 100%; transition: background 0.2s;">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
       </article>
     </div>
   </main>
@@ -48,8 +152,10 @@
       <div class="footer-column">
         <h3>Resources</h3>
         <ul>
-          <li><a href="book-reviews.html"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book Reviews</a></li>
-          <li><a href="productivity.html"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a></li>
+          <li><a href="book-reviews.html"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book
+              Reviews</a></li>
+          <li><a href="productivity.html"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a>
+          </li>
           <li><a href="featured.html"><i data-lucide="star" style="width:14px;height:14px;"></i> Featured</a></li>
           <li><a href="archive.html"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archive</a></li>
         </ul>
@@ -70,4 +176,5 @@
   </footer>
   <script>lucide.createIcons();</script>
 </body>
+
 </html>
