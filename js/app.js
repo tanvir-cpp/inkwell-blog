@@ -67,6 +67,9 @@
     dom.postAuthorAvatar = document.getElementById('post-author-avatar');
     dom.heroTitle = document.getElementById('hero-title');
     dom.heroSubtitle = document.getElementById('hero-subtitle');
+    dom.pageView = document.getElementById('page-view');
+    dom.pageTitle = document.getElementById('page-title');
+    dom.pageBody = document.getElementById('page-body');
   }
 
   // ─── Load Data — Supabase ───
@@ -197,6 +200,12 @@
   function handleRoute() {
     const hash = window.location.hash.slice(1);
 
+    if (hash.startsWith('page/')) {
+      const pageId = hash.replace('page/', '');
+      showPage(pageId);
+      return;
+    }
+
     if (hash.startsWith('post/')) {
       const postId = hash.replace('post/', '');
       const post = state.posts.find(p => p.id === postId);
@@ -225,6 +234,7 @@
 
     dom.homeView.style.display = 'block';
     dom.postView.classList.remove('active');
+    if (dom.pageView) dom.pageView.style.display = 'none';
     dom.heroSection.style.display = 'block';
     dom.readingProgress.style.width = '0';
 
@@ -243,6 +253,7 @@
 
     dom.homeView.style.display = 'none';
     dom.heroSection.style.display = 'none';
+    if (dom.pageView) dom.pageView.style.display = 'none';
     dom.postView.classList.add('active');
 
     // Update post header
@@ -272,6 +283,33 @@
         console.error('Markdown load error:', err);
       }
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── Show Page View ───
+  function showPage(pageId) {
+    state.currentView = 'page';
+    dom.homeView.style.display = 'none';
+    dom.heroSection.style.display = 'none';
+    dom.postView.classList.remove('active');
+    if (dom.pageView) dom.pageView.style.display = 'block';
+
+    const pages = {
+      'about': { title: 'About Us', content: '<p>Welcome to InkWell. We are a passionate team of writers, developers, and designers sharing our thoughts with the world. We believe in the power of stories, code, and creative thinking.</p>' },
+      'contact': { title: 'Contact', content: '<p>Have a question or want to work with us? Drop us an email at <strong>hello@inkwellblog.com</strong>.</p>' },
+      'book-reviews': { title: 'Book Reviews', content: '<p>Check out our latest reviews on programming, design, and productivity books.</p>' },
+      'productivity': { title: 'Productivity', content: '<p>Resources, tools, and guides to help you work smarter and stay organized.</p>' },
+      'featured': { title: 'Featured Series', content: '<p>A collection of our best and most deeply researched multi-part series.</p>' },
+      'archive': { title: 'Archive', content: '<p>Looking for something specific? Browse our complete archive of published work.</p>' },
+      'podcast': { title: 'Podcast', content: '<p>Listen to the official InkWell podcast where we discuss technology, design, and the creative life. Available on Spotify and Apple Podcasts.</p>' },
+      'rss': { title: 'RSS Feed', content: '<p>Subscribe to our <a href="#">RSS Feed</a> to get the latest articles delivered directly to your reader.</p>' }
+    };
+
+    const page = pages[pageId] || { title: 'Page Not Found', content: '<p>We could not find the page you are looking for.</p>' };
+
+    if (dom.pageTitle) dom.pageTitle.textContent = page.title;
+    if (dom.pageBody) dom.pageBody.innerHTML = page.content;
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -348,17 +386,11 @@
         <img class="article-card-image" src="${post.thumbnail}" alt="${post.title}" loading="lazy">
         <div class="article-card-content">
           <span class="category-badge" data-category="${post.category}">
-            <i data-lucide="${getCategoryIcon(post.category)}"></i>
+            <i data-lucide="${getCategoryIcon(post.category)}" style="width:14px;height:14px;"></i>
             ${post.category}
           </span>
           <h3 class="article-card-title">${post.title}</h3>
-          <p class="article-card-subtitle">${post.excerpt}</p>
-          <div class="article-card-meta">
-            <div class="author-avatar">${post.authorAvatar}</div>
-            <span>${post.author}</span>
-            <span><i data-lucide="calendar" style="width:12px;height:12px;"></i> ${formatDate(post.date)}</span>
-            <span><i data-lucide="clock" style="width:12px;height:12px;"></i> ${post.readTime}</span>
-          </div>
+          <p class="article-card-subtitle">${post.subtitle || post.excerpt}</p>
         </div>
       </article>
     `).join('');

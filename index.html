@@ -41,8 +41,7 @@
     <div class="header-inner">
       <!-- Logo -->
       <a href="#" class="logo" aria-label="InkWell Home">
-        <span class="logo-icon"><i data-lucide="pen-tool" style="width:18px;height:18px;"></i></span>
-        InkWell
+        INK<span style="color: var(--text);">WELL</span>
       </a>
 
       <!-- Desktop Navigation -->
@@ -227,6 +226,19 @@
       </button>
     </div>
 
+    <!-- ────────── STATIC PAGE VIEW ────────── -->
+    <div class="page-view" id="page-view" style="display: none;">
+      <div class="page-header"
+        style="max-width: var(--max-width-sm); margin: var(--space-4xl) auto var(--space-xl); padding: 0 var(--space-xl); text-align: center;">
+        <h1 class="page-title" id="page-title"
+          style="font-family: var(--font-display); font-size: 3rem; text-transform: uppercase; color: var(--navy); letter-spacing: 0.05em;">
+        </h1>
+      </div>
+      <article class="page-body post-body" id="page-body">
+        <!-- Rendered by JS -->
+      </article>
+    </div>
+
   </main>
 
   <!-- ================================================================
@@ -237,8 +249,7 @@
       <!-- Brand Column -->
       <div class="footer-brand">
         <a href="#" class="logo">
-          <span class="logo-icon"><i data-lucide="pen-tool" style="width:18px;height:18px;"></i></span>
-          InkWell
+          INK<span style="color: var(--text);">WELL</span>
         </a>
         <p>Stories, code, and creative thinking. A blog for curious minds who love to learn, build, and explore.</p>
         <img src="assets/images/mascot.png" alt="InkWell Mascot" class="footer-mascot">
@@ -259,20 +270,22 @@
       <div class="footer-column">
         <h3>Resources</h3>
         <ul>
-          <li><a href="#"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book Reviews</a></li>
-          <li><a href="#"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a></li>
-          <li><a href="#"><i data-lucide="star" style="width:14px;height:14px;"></i> Featured</a></li>
-          <li><a href="#"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archive</a></li>
+          <li><a href="#page/book-reviews"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Book
+              Reviews</a></li>
+          <li><a href="#page/productivity"><i data-lucide="zap" style="width:14px;height:14px;"></i> Productivity</a>
+          </li>
+          <li><a href="#page/featured"><i data-lucide="star" style="width:14px;height:14px;"></i> Featured</a></li>
+          <li><a href="#page/archive"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archive</a></li>
         </ul>
       </div>
 
       <div class="footer-column">
         <h3>More</h3>
         <ul>
-          <li><a href="#"><i data-lucide="user" style="width:14px;height:14px;"></i> About</a></li>
-          <li><a href="#"><i data-lucide="mail" style="width:14px;height:14px;"></i> Contact</a></li>
-          <li><a href="#"><i data-lucide="rss" style="width:14px;height:14px;"></i> RSS Feed</a></li>
-          <li><a href="#"><i data-lucide="headphones" style="width:14px;height:14px;"></i> Podcast</a></li>
+          <li><a href="#page/about"><i data-lucide="user" style="width:14px;height:14px;"></i> About</a></li>
+          <li><a href="#page/contact"><i data-lucide="mail" style="width:14px;height:14px;"></i> Contact</a></li>
+          <li><a href="#page/rss"><i data-lucide="rss" style="width:14px;height:14px;"></i> RSS Feed</a></li>
+          <li><a href="#page/podcast"><i data-lucide="headphones" style="width:14px;height:14px;"></i> Podcast</a></li>
         </ul>
       </div>
     </div>
