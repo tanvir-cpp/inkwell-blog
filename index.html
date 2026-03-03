@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InkWell — Stories, Code & Creative Thinking</title>
-  <meta name="description" content="A blog about web development, design, technology, and the creative life. Dive into tutorials, travel guides, productivity hacks, and curated resources.">
+  <meta name="description"
+    content="A blog about web development, design, technology, and the creative life. Dive into tutorials, travel guides, productivity hacks, and curated resources.">
   <meta name="author" content="Tanvir Ahmed">
-  
+
   <!-- Open Graph -->
   <meta property="og:title" content="InkWell — Stories, Code & Creative Thinking">
   <meta property="og:description" content="A blog about web development, design, technology, and the creative life.">
@@ -23,6 +25,7 @@
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
   <!-- Reading Progress Bar -->
@@ -97,13 +100,7 @@
     <div class="search-container">
       <div class="search-input-wrapper">
         <i data-lucide="search"></i>
-        <input 
-          type="text" 
-          class="search-input" 
-          id="search-input"
-          placeholder="Search articles..."
-          autocomplete="off"
-        >
+        <input type="text" class="search-input" id="search-input" placeholder="Search articles..." autocomplete="off">
       </div>
       <div class="search-results" id="search-results"></div>
       <p class="search-hint">
@@ -128,7 +125,8 @@
           Latest Article · Featured
         </div>
         <h1 class="hero-title" id="hero-title">Stories, Code & Creative Thinking</h1>
-        <p class="hero-subtitle" id="hero-subtitle">Tutorials, travel guides, productivity hacks, and curated resources for curious minds.</p>
+        <p class="hero-subtitle" id="hero-subtitle">Tutorials, travel guides, productivity hacks, and curated resources
+          for curious minds.</p>
       </div>
     </section>
 
@@ -181,7 +179,8 @@
             <div class="sidebar-widget newsletter-widget">
               <h3 class="sidebar-widget-title">Stay in the Loop</h3>
               <p>Get the latest articles and resources delivered straight to your inbox. No spam, ever.</p>
-              <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='SUBSCRIBED ✓'; this.querySelector('button').style.background='var(--teal)';">
+              <form class="newsletter-form"
+                onsubmit="event.preventDefault(); this.querySelector('button').textContent='SUBSCRIBED ✓'; this.querySelector('button').style.background='var(--teal)';">
                 <input type="email" class="newsletter-input" placeholder="you@example.com" required>
                 <button type="submit" class="newsletter-btn">Subscribe</button>
               </form>
@@ -289,7 +288,12 @@
     </div>
   </footer>
 
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
   <!-- App Script -->
   <script src="js/app.js"></script>
 </body>
+
 </html>

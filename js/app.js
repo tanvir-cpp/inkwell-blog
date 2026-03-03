@@ -1,6 +1,7 @@
 /* ==========================================================================
    InkWell Blog — Core Application Engine
    Handles routing, rendering, markdown parsing, search, and interactivity
+   Now powered by Supabase CMS with fallback to local JSON
    ========================================================================== */
 
 (function () {
@@ -17,6 +18,7 @@
     searchQuery: '',
     page: 1,
     postsPerPage: 6,
+    useSupabase: false,
   };
 
   // ─── DOM Cache ───
@@ -67,25 +69,73 @@
     dom.heroSubtitle = document.getElementById('hero-subtitle');
   }
 
-  // ─── Load Data ───
+  // ─── Load Data — Supabase first, fallback to JSON ───
   async function loadData() {
-    try {
-      const [postsRes, categoriesRes, siteRes] = await Promise.all([
-        fetch('data/posts.json'),
-        fetch('data/categories.json'),
-        fetch('data/site.json'),
-      ]);
+    // Try Supabase first
+    if (window.supabase && typeof supabase !== 'undefined') {
+      try {
+        const [postsRes, catsRes] = await Promise.all([
+          supabase
+            .from('posts')
+            .select('*')
+            .eq('status', 'published')
+            .order('date', { ascending: false }),
+          supabase
+            .from('categories')
+            .select('*')
+            .order('sort_order', { ascending: true })
+        ]);
 
-      state.posts = await postsRes.json();
-      state.categories = await categoriesRes.json();
-      state.siteConfig = await siteRes.json();
+        if (postsRes.data && postsRes.data.length > 0) {
+          state.posts = postsRes.data.map(p => ({
+            id: p.id,
+            title: p.title,
+            subtitle: p.subtitle,
+            category: p.category_id,
+            tags: p.tags || [],
+            author: p.author_name,
+            authorAvatar: p.author_avatar,
+            date: p.date,
+            readTime: p.read_time,
+            thumbnail: p.thumbnail,
+            excerpt: p.excerpt,
+            content: p.content,
+            featured: p.featured,
+            markdown: null, // Content stored directly in DB
+          }));
+          state.useSupabase = true;
+          console.log('✅ Loaded from Supabase:', state.posts.length, 'posts');
+        }
 
-      // Sort posts by date (newest first)
-      state.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    } catch (err) {
-      console.error('Failed to load data:', err);
+        if (catsRes.data && catsRes.data.length > 0) {
+          state.categories = catsRes.data;
+        }
+      } catch (err) {
+        console.warn('Supabase load failed, falling back to JSON:', err);
+      }
     }
+
+    // Fallback to local JSON
+    if (!state.useSupabase) {
+      try {
+        const [postsRes, categoriesRes] = await Promise.all([
+          fetch('data/posts.json'),
+          fetch('data/categories.json'),
+        ]);
+        state.posts = await postsRes.json();
+        state.categories = await categoriesRes.json();
+        state.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+        console.log('📁 Loaded from local JSON:', state.posts.length, 'posts');
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    }
+
+    // Load site config (always from JSON)
+    try {
+      const siteRes = await fetch('data/site.json');
+      state.siteConfig = await siteRes.json();
+    } catch (e) { /* ignore */ }
   }
 
   // ─── Event Listeners ───
@@ -136,7 +186,6 @@
           state.activeCategory = 'all';
           navigateTo('home');
         } else {
-          // Ensure we're on home view first
           if (state.currentView !== 'home') {
             window.location.hash = '';
             state.currentView = 'home';
@@ -151,7 +200,6 @@
           state.page = 1;
           renderCategoryFilters();
           renderArticles();
-          // Scroll to articles section
           setTimeout(() => {
             dom.articlesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 100);
@@ -230,14 +278,20 @@
     dom.postReadTime.textContent = post.readTime;
     dom.postAuthorAvatar.textContent = post.authorAvatar;
 
-    // Load and render markdown
-    try {
-      const res = await fetch(post.markdown);
-      const markdown = await res.text();
-      dom.postBody.innerHTML = parseMarkdown(markdown);
-    } catch (err) {
-      dom.postBody.innerHTML = '<p>Failed to load article content.</p>';
-      console.error('Markdown load error:', err);
+    // Render content
+    if (post.content) {
+      // Content from Supabase (stored as markdown string)
+      dom.postBody.innerHTML = parseMarkdown(post.content);
+    } else if (post.markdown) {
+      // Content from local markdown file
+      try {
+        const res = await fetch(post.markdown);
+        const markdown = await res.text();
+        dom.postBody.innerHTML = parseMarkdown(markdown);
+      } catch (err) {
+        dom.postBody.innerHTML = '<p>Failed to load article content.</p>';
+        console.error('Markdown load error:', err);
+      }
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -277,7 +331,6 @@
 
     dom.categoryFilters.innerHTML = allBtn + catBtns;
 
-    // Attach click listeners
     dom.categoryFilters.querySelectorAll('.category-filter').forEach(btn => {
       btn.addEventListener('click', () => {
         state.activeCategory = btn.dataset.category;
@@ -331,7 +384,6 @@
       </article>
     `).join('');
 
-    // Pagination
     const totalPages = Math.ceil(filtered.length / state.postsPerPage);
     renderPagination(totalPages);
     refreshIcons();
@@ -371,7 +423,6 @@
 
   // ─── Render Sidebar ───
   function renderSidebar() {
-    // Categories
     const categoryCounts = {};
     state.posts.forEach(p => {
       categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
@@ -393,9 +444,10 @@
       });
     });
 
-    // Tags
     const allTags = new Set();
-    state.posts.forEach(p => p.tags.forEach(t => allTags.add(t)));
+    state.posts.forEach(p => {
+      if (p.tags) p.tags.forEach(t => allTags.add(t));
+    });
     dom.sidebarTags.innerHTML = [...allTags].map(tag =>
       `<span class="sidebar-tag">${tag}</span>`
     ).join('');
@@ -428,7 +480,7 @@
       post.title.toLowerCase().includes(query) ||
       post.subtitle.toLowerCase().includes(query) ||
       post.excerpt.toLowerCase().includes(query) ||
-      post.tags.some(t => t.toLowerCase().includes(query)) ||
+      (post.tags && post.tags.some(t => t.toLowerCase().includes(query))) ||
       post.category.toLowerCase().includes(query)
     );
 
@@ -507,7 +559,7 @@
   function parseMarkdown(md) {
     let html = md;
 
-    // Code blocks (``` ```)
+    // Code blocks
     html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
       return `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
     });
@@ -531,7 +583,6 @@
 
     // Blockquotes
     html = html.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
-    // Merge consecutive blockquote paragraphs
     html = html.replace(/<\/blockquote>\s*<blockquote>/g, '');
 
     // Bold
@@ -566,15 +617,14 @@
     // Ordered lists
     html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
 
-    // Paragraphs — wrap remaining text in <p> tags
+    // Paragraphs
     html = html.split('\n\n').map(block => {
       block = block.trim();
       if (!block) return '';
-      if (block.startsWith('<')) return block; // Already HTML
+      if (block.startsWith('<')) return block;
       return `<p>${block}</p>`;
     }).join('\n');
 
-    // Clean up stray newlines inside paragraphs
     html = html.replace(/<p>\s*<\/p>/g, '');
     html = html.replace(/\n/g, ' ');
 

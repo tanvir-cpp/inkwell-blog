@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InkWell Admin — Content Management</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+</head>
+
+<body>
+
+    <!-- ════════ LOGIN SCREEN ════════ -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <h1>✦ InkWell</h1>
+                <p>Admin & Writer Portal</p>
+            </div>
+
+            <div class="login-error" id="login-error"></div>
+
+            <form id="login-form">
+                <div class="form-group" id="signup-name-group" style="display:none;">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="login-name" placeholder="Tanvir Ahmed">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="login-email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="login-password" placeholder="••••••••" required
+                        minlength="6">
+                </div>
+                <div class="form-group" id="signup-role-group" style="display:none;">
+                    <label class="form-label">Role</label>
+                    <select class="form-input" id="login-role" style="padding:0.75rem 1rem;cursor:pointer;">
+                        <option value="admin">Admin</option>
+                        <option value="writer">Writer</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
+            </form>
+
+            <p style="text-align:center; margin-top:1.25rem; font-size:0.8rem; color:var(--admin-text-muted);">
+                <span id="auth-toggle-text">Don't have an account? </span>
+                <a href="#" id="auth-toggle-link" style="color:var(--admin-teal); text-decoration:none;"
+                    onclick="toggleAuthMode(event)">Create Account</a>
+            </p>
+            <p style="text-align:center; margin-top:0.5rem; font-size:0.8rem; color:var(--admin-text-muted);">
+                <a href="index.html" style="color:var(--admin-text-muted); text-decoration:none;">← Back to Blog</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ════════ ADMIN LAYOUT ════════ -->
+    <div class="admin-layout" id="admin-layout">
+
+        <!-- ─── Sidebar ─── -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>✦ InkWell</h2>
+                <p>Content Manager</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link active" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i> Dashboard
+                </a>
+                <a class="sidebar-link" data-page="posts">
+                    <i data-lucide="file-text"></i> Posts
+                </a>
+                <a class="sidebar-link" data-page="new-post">
+                    <i data-lucide="plus-circle"></i> New Post
+                </a>
+                <a class="sidebar-link" data-page="categories">
+                    <i data-lucide="folder"></i> Categories
+                </a>
+                <a class="sidebar-link" id="users-link" data-page="users" style="display:none;">
+                    <i data-lucide="users"></i> Users
+                </a>
+
+                <div style="flex:1;"></div>
+
+                <a class="sidebar-link" href="index.html">
+                    <i data-lucide="external-link"></i> View Blog
+                </a>
+                <a class="sidebar-link" id="logout-btn">
+                    <i data-lucide="log-out"></i> Sign Out
+                </a>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="sidebar-avatar">TA</div>
+                <div class="sidebar-user-info">
+                    <div class="name" id="sidebar-name">Tanvir Ahmed</div>
+                    <div class="role" id="sidebar-role">Admin</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ─── Main Content ─── -->
+        <main class="admin-main">
+
+            <!-- ─── Dashboard Page ─── -->
+            <div class="admin-page" id="page-dashboard">
+                <div class="admin-topbar">
+                    <h1>Dashboard</h1>
+                    <div class="admin-topbar-actions">
+                        <button class="btn btn-primary btn-sm" onclick="showPage('new-post')">
+                            <i data-lucide="plus" style="width:14px;height:14px;"></i> New Post
+                        </button>
+                    </div>
+                </div>
+                <div class="admin-content">
+                    <div class="stats-grid" id="stats-grid">
+                        <!-- Rendered by JS -->
+                    </div>
+                    <h2 style="font-size:1rem; margin-bottom:1rem; color:var(--admin-text-secondary);">Recent Posts</h2>
+                    <div class="posts-table-wrapper">
+                        <table class="posts-table" id="recent-posts-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-posts-body">
+                                <!-- Rendered by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Posts Page ─── -->
+            <div class="admin-page" id="page-posts" style="display:none;">
+                <div class="admin-topbar">
+                    <h1>All Posts</h1>
+                    <div class="admin-topbar-actions">
+                        <select class="form-select" id="posts-filter" style="width:160px;">
+                            <option value="all">All Status</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Drafts</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" onclick="showPage('new-post')">
+                            <i data-lucide="plus" style="width:14px;height:14px;"></i> New Post
+                        </button>
+                    </div>
+                </div>
+                <div class="admin-content">
+                    <div class="posts-table-wrapper">
+                        <table class="posts-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-posts-body">
+                                <!-- Rendered by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── New/Edit Post Page ─── -->
+            <div class="admin-page" id="page-new-post" style="display:none;">
+                <div class="admin-topbar">
+                    <h1 id="editor-page-title">New Post</h1>
+                    <div class="admin-topbar-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="saveDraft()">
+                            <i data-lucide="save" style="width:14px;height:14px;"></i> Save Draft
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="publishPost()">
+                            <i data-lucide="send" style="width:14px;height:14px;"></i> Publish
+                        </button>
+                    </div>
+                </div>
+                <div class="admin-content">
+                    <div class="editor-container">
+                        <div class="editor-main">
+                            <!-- Title -->
+                            <div class="editor-card">
+                                <input type="text" class="editor-title-input" id="editor-title"
+                                    placeholder="Post title...">
+                                <input type="text" class="editor-subtitle-input" id="editor-subtitle"
+                                    placeholder="Subtitle or tagline...">
+                            </div>
+
+                            <!-- Content -->
+                            <div class="editor-card">
+                                <h3>Content</h3>
+
+                                <div class="preview-toggle">
+                                    <button class="active" id="tab-write" onclick="switchTab('write')">Write</button>
+                                    <button id="tab-preview" onclick="switchTab('preview')">Preview</button>
+                                </div>
+
+                                <div class="editor-toolbar" id="editor-toolbar">
+                                    <button class="toolbar-btn" title="Bold"
+                                        onclick="insertMarkdown('**','**')"><b>B</b></button>
+                                    <button class="toolbar-btn" title="Italic"
+                                        onclick="insertMarkdown('*','*')"><i>I</i></button>
+                                    <button class="toolbar-btn" title="Code" onclick="insertMarkdown('`','`')"><i
+                                            data-lucide="code" style="width:14px;height:14px;"></i></button>
+                                    <div class="toolbar-divider"></div>
+                                    <button class="toolbar-btn" title="Heading 2"
+                                        onclick="insertMarkdown('## ','')">H2</button>
+                                    <button class="toolbar-btn" title="Heading 3"
+                                        onclick="insertMarkdown('### ','')">H3</button>
+                                    <div class="toolbar-divider"></div>
+                                    <button class="toolbar-btn" title="Link" onclick="insertMarkdown('[','](url)')"><i
+                                            data-lucide="link" style="width:14px;height:14px;"></i></button>
+                                    <button class="toolbar-btn" title="Image" onclick="insertMarkdown('![alt](',')')"><i
+                                            data-lucide="image" style="width:14px;height:14px;"></i></button>
+                                    <button class="toolbar-btn" title="List" onclick="insertMarkdown('- ','')"><i
+                                            data-lucide="list" style="width:14px;height:14px;"></i></button>
+                                    <button class="toolbar-btn" title="Quote" onclick="insertMarkdown('> ','')"><i
+                                            data-lucide="quote" style="width:14px;height:14px;"></i></button>
+                                    <button class="toolbar-btn" title="Code Block"
+                                        onclick="insertMarkdown('```\n','\n```')"><i data-lucide="terminal"
+                                            style="width:14px;height:14px;"></i></button>
+                                    <div class="toolbar-divider"></div>
+                                    <button class="toolbar-btn" title="Horizontal Rule"
+                                        onclick="insertMarkdown('\n---\n','')">—</button>
+                                </div>
+
+                                <textarea class="markdown-editor" id="markdown-editor"
+                                    placeholder="Write your article in Markdown..."></textarea>
+                                <div class="markdown-preview" id="markdown-preview"></div>
+                            </div>
+                        </div>
+
+                        <!-- Editor Sidebar -->
+                        <div class="editor-sidebar">
+                            <!-- Publish Settings -->
+                            <div class="editor-card">
+                                <h3>Publish Settings</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="editor-status">
+                                        <option value="draft">Draft</option>
+                                        <option value="published">Published</option>
+                                        <option value="archived">Archived</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-input" id="editor-date">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Read Time</label>
+                                    <input type="text" class="form-input" id="editor-readtime"
+                                        placeholder="e.g. 8 min read">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label class="editor-featured-toggle" onclick="toggleFeatured()">
+                                        <div class="toggle-switch" id="featured-toggle"></div>
+                                        <span style="font-size:0.85rem;">Featured Post</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Category & Tags -->
+                            <div class="editor-card">
+                                <h3>Category & Tags</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" id="editor-category">
+                                        <!-- Rendered by JS -->
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label class="form-label">Tags</label>
+                                    <div class="tags-input-wrapper" id="tags-wrapper"
+                                        onclick="document.getElementById('tags-input').focus()">
+                                        <input type="text" class="tags-input" id="tags-input"
+                                            placeholder="Type & press Enter...">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thumbnail -->
+                            <div class="editor-card">
+                                <h3>Thumbnail</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Image URL</label>
+                                    <input type="text" class="form-input" id="editor-thumbnail"
+                                        placeholder="assets/images/articles/coding.png">
+                                </div>
+                                <img id="thumbnail-preview"
+                                    style="width:100%;border-radius:var(--admin-radius);margin-top:0.5rem;display:none;"
+                                    alt="Thumbnail preview">
+                            </div>
+
+                            <!-- Excerpt -->
+                            <div class="editor-card">
+                                <h3>Excerpt</h3>
+                                <textarea class="form-input" id="editor-excerpt" rows="4"
+                                    placeholder="Brief description for listings..." style="resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Categories Page ─── -->
+            <div class="admin-page" id="page-categories" style="display:none;">
+                <div class="admin-topbar">
+                    <h1>Categories</h1>
+                </div>
+                <div class="admin-content">
+                    <div class="categories-grid" id="categories-grid">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Users Page (Admin only) ─── -->
+            <div class="admin-page" id="page-users" style="display:none;">
+                <div class="admin-topbar">
+                    <h1>Users</h1>
+                </div>
+                <div class="admin-content">
+                    <div class="users-table-wrapper">
+                        <table class="posts-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-body">
+                                <!-- Rendered by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ═══ Toast Container ═══ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ═══ Delete Confirmation Modal ═══ -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <h2>Delete Post?</h2>
+            <p style="color:var(--admin-text-secondary); font-size:0.9rem;">This action cannot be undone. The post will
+                be permanently removed.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary btn-sm" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger btn-sm" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Admin Script ═══ -->
+    <script>
+        // ─── Admin State ───
+        const adminState = {
+            user: null,
+            profile: null,
+            posts: [],
+            categories: [],
+            editingPostId: null,
+            editorTags: [],
+            isFeatured: false,
+        };
+
+        // ─── Init ───
+        async function initAdmin() {
+            lucide.createIcons();
+
+            // Check session
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await loadUserProfile(session.user);
+                showAdmin();
+            }
+
+            // Auth state changes
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    await loadUserProfile(session.user);
+                    showAdmin();
+                } else if (event === 'SIGNED_OUT') {
+                    showLogin();
+                }
+            });
+
+            setupLoginForm();
+            setupLogout();
+            setupSidebarNav();
+            setupPostsFilter();
+            setupTagsInput();
+            setupThumbnailPreview();
+        }
+
+        // ─── Auth ───
+        let isSignUpMode = false;
+
+        function toggleAuthMode(e) {
+            e.preventDefault();
+            isSignUpMode = !isSignUpMode;
+            const btn = document.getElementById('login-btn');
+            const toggleText = document.getElementById('auth-toggle-text');
+            const toggleLink = document.getElementById('auth-toggle-link');
+            const nameGroup = document.getElementById('signup-name-group');
+            const roleGroup = document.getElementById('signup-role-group');
+            const errorEl = document.getElementById('login-error');
+            errorEl.classList.remove('visible');
+
+            if (isSignUpMode) {
+                btn.textContent = 'Create Account';
+                toggleText.textContent = 'Already have an account? ';
+                toggleLink.textContent = 'Sign In';
+                nameGroup.style.display = 'block';
+                roleGroup.style.display = 'block';
+            } else {
+                btn.textContent = 'Sign In';
+                toggleText.textContent = "Don't have an account? ";
+                toggleLink.textContent = 'Create Account';
+                nameGroup.style.display = 'none';
+                roleGroup.style.display = 'none';
+            }
+        }
+
+        function setupLoginForm() {
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('login-error');
+                const btn = document.getElementById('login-btn');
+
+                const originalText = btn.textContent;
+                btn.textContent = isSignUpMode ? 'Creating account...' : 'Signing in...';
+                btn.disabled = true;
+                errorEl.classList.remove('visible');
+
+                if (isSignUpMode) {
+                    // Sign Up
+                    const name = document.getElementById('login-name').value.trim() || email.split('@')[0];
+                    const role = document.getElementById('login-role').value;
+                    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
+
+                    const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                full_name: name,
+                                role: role,
+                                avatar_initials: initials,
+                            }
+                        }
+                    });
+
+                    if (error) {
+                        errorEl.textContent = error.message;
+                        errorEl.classList.add('visible');
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // Auto-login after signup (if email confirmation is disabled)
+                    if (data.session) {
+                        // Already signed in
+                        return;
+                    } else {
+                        errorEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+                        errorEl.style.borderColor = 'rgba(0,174,185,0.3)';
+                        errorEl.style.background = 'rgba(0,174,185,0.1)';
+                        errorEl.style.color = 'var(--admin-teal)';
+                        errorEl.classList.add('visible');
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        // Switch back to login
+                        toggleAuthMode(new Event('click'));
+                    }
+                } else {
+                    // Sign In
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+                    if (error) {
+                        errorEl.textContent = error.message;
+                        errorEl.classList.add('visible');
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+            });
+        }
+
+        function setupLogout() {
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                showLogin();
+            });
+        }
+
+        async function loadUserProfile(user) {
+            adminState.user = user;
+
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            adminState.profile = profile || {
+                full_name: user.email.split('@')[0],
+                role: 'writer',
+                avatar_initials: user.email.substring(0, 2).toUpperCase(),
+            };
+
+            // Update sidebar
+            document.getElementById('sidebar-name').textContent = adminState.profile.full_name || user.email;
+            document.getElementById('sidebar-role').textContent = adminState.profile.role;
+            document.getElementById('sidebar-avatar').textContent = adminState.profile.avatar_initials || 'U';
+
+            // Show users link for admins
+            if (adminState.profile.role === 'admin') {
+                document.getElementById('users-link').style.display = 'flex';
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('admin-layout').classList.remove('active');
+        }
+
+        function showAdmin() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-layout').classList.add('active');
+            loadDashboard();
+        }
+
+        // ─── Sidebar Navigation ───
+        function setupSidebarNav() {
+            document.querySelectorAll('.sidebar-link[data-page]').forEach(link => {
+                link.addEventListener('click', () => {
+                    showPage(link.dataset.page);
+                });
+            });
+        }
+
+        function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.admin-page').forEach(p => p.style.display = 'none');
+
+            // Update sidebar active
+            document.querySelectorAll('.sidebar-link[data-page]').forEach(l => l.classList.remove('active'));
+            const activeLink = document.querySelector(`.sidebar-link[data-page="${page}"]`);
+            if (activeLink) activeLink.classList.add('active');
+
+            // Show page
+            const pageEl = document.getElementById(`page-${page}`);
+            if (pageEl) pageEl.style.display = 'block';
+
+            // Load page data
+            switch (page) {
+                case 'dashboard': loadDashboard(); break;
+                case 'posts': loadAllPosts(); break;
+                case 'new-post': resetEditor(); break;
+                case 'categories': loadCategories(); break;
+                case 'users': loadUsers(); break;
+            }
+
+            lucide.createIcons();
+        }
+
+        // ─── Dashboard ───
+        async function loadDashboard() {
+            // Load posts
+            const { data: posts } = await supabase
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            adminState.posts = posts || [];
+
+            const published = posts?.filter(p => p.status === 'published').length || 0;
+            const drafts = posts?.filter(p => p.status === 'draft').length || 0;
+            const total = posts?.length || 0;
+
+            // Load categories
+            const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
+            adminState.categories = cats || [];
+
+            // Stats
+            document.getElementById('stats-grid').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span>Total Posts</span>
+            <div class="stat-icon" style="background:rgba(225,0,90,0.1);color:var(--admin-pink);">
+              <i data-lucide="file-text" style="width:18px;height:18px;"></i>
+            </div>
+          </div>
+          <div class="stat-value">${total}</div>
+          <div class="stat-label">Articles in database</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span>Published</span>
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--admin-green);">
+              <i data-lucide="check-circle" style="width:18px;height:18px;"></i>
+            </div>
+          </div>
+          <div class="stat-value">${published}</div>
+          <div class="stat-label">Live on the blog</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span>Drafts</span>
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--admin-yellow);">
+              <i data-lucide="edit-3" style="width:18px;height:18px;"></i>
+            </div>
+          </div>
+          <div class="stat-value">${drafts}</div>
+          <div class="stat-label">In progress</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span>Categories</span>
+            <div class="stat-icon" style="background:rgba(59,130,246,0.1);color:var(--admin-blue);">
+              <i data-lucide="folder" style="width:18px;height:18px;"></i>
+            </div>
+          </div>
+          <div class="stat-value">${adminState.categories.length}</div>
+          <div class="stat-label">Content sections</div>
+        </div>
+      `;
+
+            // Recent posts table
+            const recent = (posts || []).slice(0, 5);
+            document.getElementById('recent-posts-body').innerHTML = recent.map(post => `
+        <tr>
+          <td class="post-row-title">${post.title}</td>
+          <td>${post.category_id}</td>
+          <td><span class="status-badge status-${post.status}">${post.status}</span></td>
+          <td style="color:var(--admin-text-muted);">${new Date(post.date).toLocaleDateString()}</td>
+          <td>
+            <div class="post-actions">
+              <button class="btn-icon" title="Edit" onclick="editPost('${post.id}')">
+                <i data-lucide="edit-2" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+            lucide.createIcons();
+        }
+
+        // ─── Posts Page ───
+        async function loadAllPosts(filter = 'all') {
+            let query = supabase.from('posts').select('*').order('created_at', { ascending: false });
+            if (filter !== 'all') query = query.eq('status', filter);
+
+            const { data: posts } = await query;
+            adminState.posts = posts || [];
+
+            if (!posts || posts.length === 0) {
+                document.getElementById('all-posts-body').innerHTML = `
+          <tr><td colspan="6">
+            <div class="empty-state">
+              <i data-lucide="file-text" style="width:48px;height:48px;display:block;margin:0 auto;"></i>
+              <h3>No posts yet</h3>
+              <p>Create your first post to get started.</p>
+              <button class="btn btn-primary btn-sm" onclick="showPage('new-post')">Create Post</button>
+            </div>
+          </td></tr>
+        `;
+                lucide.createIcons();
+                return;
+            }
+
+            document.getElementById('all-posts-body').innerHTML = posts.map(post => `
+        <tr>
+          <td class="post-row-title">${post.title}</td>
+          <td style="color:var(--admin-text-muted);">${post.author_name}</td>
+          <td>${post.category_id}</td>
+          <td><span class="status-badge status-${post.status}">${post.status}</span></td>
+          <td style="color:var(--admin-text-muted);">${new Date(post.date).toLocaleDateString()}</td>
+          <td>
+            <div class="post-actions">
+              <button class="btn-icon" title="Edit" onclick="editPost('${post.id}')">
+                <i data-lucide="edit-2" style="width:14px;height:14px;"></i>
+              </button>
+              <button class="btn-icon" title="Delete" onclick="confirmDelete('${post.id}')" style="color:var(--admin-red);">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+            lucide.createIcons();
+        }
+
+        function setupPostsFilter() {
+            document.getElementById('posts-filter').addEventListener('change', (e) => {
+                loadAllPosts(e.target.value);
+            });
+        }
+
+        // ─── Post Editor ───
+        function resetEditor() {
+            adminState.editingPostId = null;
+            adminState.editorTags = [];
+            adminState.isFeatured = false;
+
+            document.getElementById('editor-page-title').textContent = 'New Post';
+            document.getElementById('editor-title').value = '';
+            document.getElementById('editor-subtitle').value = '';
+            document.getElementById('markdown-editor').value = '';
+            document.getElementById('editor-excerpt').value = '';
+            document.getElementById('editor-thumbnail').value = '';
+            document.getElementById('editor-readtime').value = '';
+            document.getElementById('editor-status').value = 'draft';
+            document.getElementById('editor-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('featured-toggle').classList.remove('active');
+            document.getElementById('thumbnail-preview').style.display = 'none';
+
+            renderTagChips();
+            loadCategorySelect();
+            switchTab('write');
+        }
+
+        async function editPost(postId) {
+            const { data: post } = await supabase.from('posts').select('*').eq('id', postId).single();
+            if (!post) { toast('Post not found', 'error'); return; }
+
+            adminState.editingPostId = postId;
+            adminState.editorTags = post.tags || [];
+            adminState.isFeatured = post.featured;
+
+            document.getElementById('editor-page-title').textContent = 'Edit Post';
+            document.getElementById('editor-title').value = post.title;
+            document.getElementById('editor-subtitle').value = post.subtitle;
+            document.getElementById('markdown-editor').value = post.content;
+            document.getElementById('editor-excerpt').value = post.excerpt;
+            document.getElementById('editor-thumbnail').value = post.thumbnail;
+            document.getElementById('editor-readtime').value = post.read_time;
+            document.getElementById('editor-status').value = post.status;
+            document.getElementById('editor-date').value = post.date;
+
+            if (post.thumbnail) {
+                document.getElementById('thumbnail-preview').src = post.thumbnail;
+                document.getElementById('thumbnail-preview').style.display = 'block';
+            }
+
+            const featToggle = document.getElementById('featured-toggle');
+            if (post.featured) featToggle.classList.add('active');
+            else featToggle.classList.remove('active');
+
+            renderTagChips();
+            await loadCategorySelect();
+            document.getElementById('editor-category').value = post.category_id;
+
+            showPage('new-post');
+            switchTab('write');
+        }
+
+        async function loadCategorySelect() {
+            if (adminState.categories.length === 0) {
+                const { data } = await supabase.from('categories').select('*').order('sort_order');
+                adminState.categories = data || [];
+            }
+
+            document.getElementById('editor-category').innerHTML = adminState.categories.map(cat =>
+                `<option value="${cat.id}">${cat.name}</option>`
+            ).join('');
+        }
+
+        function generateSlug(title) {
+            return title
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '')
+                .substring(0, 80);
+        }
+
+        function getPostData(status) {
+            const title = document.getElementById('editor-title').value.trim();
+            if (!title) { toast('Title is required', 'error'); return null; }
+
+            const profile = adminState.profile || {};
+            const id = adminState.editingPostId || generateSlug(title);
+
+            return {
+                id,
+                title,
+                subtitle: document.getElementById('editor-subtitle').value.trim(),
+                content: document.getElementById('markdown-editor').value,
+                excerpt: document.getElementById('editor-excerpt').value.trim(),
+                category_id: document.getElementById('editor-category').value,
+                tags: adminState.editorTags,
+                thumbnail: document.getElementById('editor-thumbnail').value.trim(),
+                read_time: document.getElementById('editor-readtime').value.trim() || '5 min read',
+                date: document.getElementById('editor-date').value,
+                status,
+                featured: adminState.isFeatured,
+                author_id: adminState.user?.id || null,
+                author_name: profile.full_name || adminState.user?.email || 'Unknown',
+                author_avatar: profile.avatar_initials || 'U',
+            };
+        }
+
+        async function saveDraft() {
+            const data = getPostData('draft');
+            if (!data) return;
+            await savePost(data);
+        }
+
+        async function publishPost() {
+            const data = getPostData('published');
+            if (!data) return;
+            await savePost(data);
+        }
+
+        async function savePost(data) {
+            let result;
+
+            if (adminState.editingPostId) {
+                // Update existing
+                const { id, ...updateData } = data;
+                result = await supabase.from('posts').update(updateData).eq('id', id);
+            } else {
+                // Insert new
+                result = await supabase.from('posts').insert(data);
+            }
+
+            if (result.error) {
+                toast(`Error: ${result.error.message}`, 'error');
+                return;
+            }
+
+            toast(
+                adminState.editingPostId ? 'Post updated successfully!' : 'Post created successfully!',
+                'success'
+            );
+
+            // Go to posts list
+            setTimeout(() => showPage('posts'), 500);
+        }
+
+        // Tags
+        function setupTagsInput() {
+            const input = document.getElementById('tags-input');
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const tag = input.value.trim().replace(',', '');
+                    if (tag && !adminState.editorTags.includes(tag)) {
+                        adminState.editorTags.push(tag);
+                        renderTagChips();
+                    }
+                    input.value = '';
+                }
+                if (e.key === 'Backspace' && !input.value && adminState.editorTags.length) {
+                    adminState.editorTags.pop();
+                    renderTagChips();
+                }
+            });
+        }
+
+        function removeTag(tag) {
+            adminState.editorTags = adminState.editorTags.filter(t => t !== tag);
+            renderTagChips();
+        }
+
+        function renderTagChips() {
+            const wrapper = document.getElementById('tags-wrapper');
+            const input = document.getElementById('tags-input');
+            wrapper.querySelectorAll('.tag-chip').forEach(c => c.remove());
+
+            adminState.editorTags.forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.innerHTML = `${tag} <button onclick="removeTag('${tag}')">×</button>`;
+                wrapper.insertBefore(chip, input);
+            });
+        }
+
+        // Featured toggle
+        function toggleFeatured() {
+            adminState.isFeatured = !adminState.isFeatured;
+            document.getElementById('featured-toggle').classList.toggle('active');
+        }
+
+        // Thumbnail preview
+        function setupThumbnailPreview() {
+            document.getElementById('editor-thumbnail').addEventListener('input', (e) => {
+                const preview = document.getElementById('thumbnail-preview');
+                if (e.target.value) {
+                    preview.src = e.target.value;
+                    preview.style.display = 'block';
+                    preview.onerror = () => preview.style.display = 'none';
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+        }
+
+        // Markdown toolbar
+        function insertMarkdown(before, after) {
+            const editor = document.getElementById('markdown-editor');
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selected = editor.value.substring(start, end);
+            const replacement = before + selected + after;
+            editor.value = editor.value.substring(0, start) + replacement + editor.value.substring(end);
+            editor.focus();
+            editor.selectionStart = start + before.length;
+            editor.selectionEnd = start + before.length + selected.length;
+        }
+
+        // Preview
+        function switchTab(tab) {
+            const writeBtn = document.getElementById('tab-write');
+            const previewBtn = document.getElementById('tab-preview');
+            const editor = document.getElementById('markdown-editor');
+            const toolbar = document.getElementById('editor-toolbar');
+            const preview = document.getElementById('markdown-preview');
+
+            if (tab === 'write') {
+                writeBtn.classList.add('active');
+                previewBtn.classList.remove('active');
+                editor.style.display = 'block';
+                toolbar.style.display = 'flex';
+                preview.classList.remove('active');
+            } else {
+                writeBtn.classList.remove('active');
+                previewBtn.classList.add('active');
+                editor.style.display = 'none';
+                toolbar.style.display = 'none';
+                preview.classList.add('active');
+                preview.innerHTML = parseMarkdownAdmin(editor.value);
+            }
+        }
+
+        // Simple markdown parser for preview
+        function parseMarkdownAdmin(md) {
+            let html = md;
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => `<pre><code>${escapeHtmlAdmin(code.trim())}</code></pre>`);
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:8px;">');
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:var(--admin-teal);">$1</a>');
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+            html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--admin-border);margin:1rem 0;">');
+            html = html.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
+            html = html.replace(/<\/blockquote>\s*<blockquote>/g, '');
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+            html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+            html = html.split('\n\n').map(b => {
+                b = b.trim();
+                if (!b || b.startsWith('<')) return b;
+                return `<p>${b}</p>`;
+            }).join('\n');
+            html = html.replace(/<p>\s*<\/p>/g, '');
+            return html;
+        }
+
+        function escapeHtmlAdmin(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        // ─── Categories Page ───
+        async function loadCategories() {
+            const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
+            adminState.categories = cats || [];
+
+            document.getElementById('categories-grid').innerHTML = (cats || []).map(cat => `
+        <div class="category-card-admin">
+          <div class="category-icon-box" style="background:${cat.color}20; color:${cat.color};">
+            <i data-lucide="${cat.icon}" style="width:22px;height:22px;"></i>
+          </div>
+          <div class="category-card-info">
+            <h4>${cat.name}</h4>
+            <p>${cat.description}</p>
+          </div>
+        </div>
+      `).join('');
+
+            lucide.createIcons();
+        }
+
+        // ─── Users Page (Admin only) ───
+        async function loadUsers() {
+            const { data: users } = await supabase.from('profiles').select('*').order('created_at');
+
+            document.getElementById('users-body').innerHTML = (users || []).map(u => `
+        <tr>
+          <td style="font-weight:600;">${u.full_name || 'Unnamed'}</td>
+          <td style="color:var(--admin-text-muted);">${u.email}</td>
+          <td><span class="status-badge ${u.role === 'admin' ? 'status-published' : 'status-draft'}">${u.role}</span></td>
+          <td style="color:var(--admin-text-muted);">${new Date(u.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+        }
+
+        // ─── Delete ───
+        let deleteTargetId = null;
+
+        function confirmDelete(postId) {
+            deleteTargetId = postId;
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            deleteTargetId = null;
+            document.getElementById('delete-modal').classList.remove('active');
+        }
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!deleteTargetId) return;
+            const { error } = await supabase.from('posts').delete().eq('id', deleteTargetId);
+            closeDeleteModal();
+
+            if (error) {
+                toast(`Error: ${error.message}`, 'error');
+            } else {
+                toast('Post deleted.', 'success');
+                loadAllPosts();
+            }
+        });
+
+        // ─── Toast ───
+        function toast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast toast-${type}`;
+            el.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info'}" style="width:16px;height:16px;flex-shrink:0;"></i> ${message}`;
+            container.appendChild(el);
+            lucide.createIcons();
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(10px)';
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
+        }
+
+        // ─── Boot ───
+        document.addEventListener('DOMContentLoaded', initAdmin);
+    </script>
+</body>
+
+</html>
