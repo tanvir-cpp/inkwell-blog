@@ -156,9 +156,12 @@ body {
 }
 
 .btn-primary {
-    width: 100%;
     background: linear-gradient(135deg, var(--admin-pink), var(--admin-pink-light));
     color: white;
+}
+
+.w-full {
+    width: 100%;
 }
 
 .btn-primary:hover {
@@ -228,6 +231,16 @@ body {
 
 .login-error.visible {
     display: block;
+}
+
+.back-link {
+    color: var(--admin-text-muted);
+    text-decoration: none;
+    transition: color 0.3s var(--admin-transition);
+}
+
+.back-link:hover {
+    color: var(--admin-text);
 }
 
 /* ---------- Admin Layout ---------- */
@@ -448,7 +461,7 @@ body {
     background: var(--admin-surface);
     border: 1px solid var(--admin-border);
     border-radius: var(--admin-radius-lg);
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .posts-table {
@@ -517,6 +530,24 @@ body {
 .post-actions {
     display: flex;
     gap: 0.5rem;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--admin-text-muted);
+}
+
+.empty-state h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--admin-text);
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
 }
 
 /* ---------- Page: Post Editor ---------- */
