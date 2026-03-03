@@ -36,6 +36,8 @@
   --cat-resources: #8b5cf6;
   --cat-productivity: #10b981;
   --cat-technology: #3b82f6;
+  --cat-book-reviews: #ff5722;
+  --cat-podcast: #e91e63;
 
   /* Typography */
   --font-display: 'Unica One', 'Impact', sans-serif;
@@ -674,6 +676,36 @@ button {
 
 .category-badge[data-category="technology"] {
   background: var(--cat-technology);
+}
+
+.category-badge[data-category="book-reviews"] {
+  background: var(--cat-book-reviews);
+}
+
+.category-badge[data-category="podcast"] {
+  background: var(--cat-podcast);
+}
+
+/* Fallback for any unknown category */
+.category-badge:not([data-category]) {
+  background: var(--gray-500);
+}
+
+/* Post Media Player */
+.post-media-player {
+  margin: 2rem auto;
+  max-width: var(--max-width-sm);
+  padding: 0 var(--space-xl);
+}
+
+.post-media-player audio {
+  width: 100%;
+  border-radius: var(--radius-md);
+}
+
+.post-media-player iframe {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .featured-card-title {

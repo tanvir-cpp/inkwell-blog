@@ -91,6 +91,7 @@
         if (postsRes.data && postsRes.data.length > 0) {
           state.posts = postsRes.data.map(p => ({
             id: p.id,
+            slug: p.slug || p.id,
             title: p.title,
             subtitle: p.subtitle,
             category: p.category_id,
@@ -104,6 +105,7 @@
             content: p.content,
             mediaUrl: p.media_url,
             featured: p.featured,
+            views: p.views || 0,
             markdown: null, // Content stored directly in DB
           }));
           state.useSupabase = true;
@@ -256,6 +258,11 @@
     dom.heroSection.style.display = 'none';
     if (dom.pageView) dom.pageView.style.display = 'none';
     dom.postView.classList.add('active');
+
+    // Increment view count in Supabase (fire and forget)
+    if (state.useSupabase) {
+      supabase.rpc('increment_views', { post_id: post.id }).catch(() => { });
+    }
 
     // Update post header
     dom.postHeroImg.src = post.thumbnail;

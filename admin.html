@@ -47,14 +47,27 @@
     <!-- ════════ ADMIN LAYOUT ════════ -->
     <div class="admin-layout" id="admin-layout">
 
+        <!-- ─── Mobile Top Bar ─── -->
+        <div class="admin-mobile-topbar" id="admin-mobile-topbar">
+            <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle" aria-label="Toggle sidebar">
+                <span></span><span></span><span></span>
+            </button>
+            <h2>✦ InkWell</h2>
+            <div style="width:40px;"></div>
+        </div>
+
+        <!-- ─── Sidebar Overlay ─── -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
         <!-- ─── Sidebar ─── -->
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" id="admin-sidebar">
             <div class="sidebar-header">
                 <h2>✦ InkWell</h2>
                 <p>Content Manager</p>
             </div>
 
             <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Content</div>
                 <a class="sidebar-link active" data-page="dashboard">
                     <i data-lucide="layout-dashboard"></i> Dashboard
                 </a>
@@ -67,8 +80,13 @@
                 <a class="sidebar-link" data-page="categories">
                     <i data-lucide="folder"></i> Categories
                 </a>
+
+                <div class="sidebar-section-label">Admin</div>
                 <a class="sidebar-link" id="users-link" data-page="users" style="display:none;">
                     <i data-lucide="users"></i> Users
+                </a>
+                <a class="sidebar-link" data-page="activity">
+                    <i data-lucide="activity"></i> Activity Log
                 </a>
 
                 <div style="flex:1;"></div>
@@ -132,22 +150,39 @@
                 <div class="admin-topbar">
                     <h1>All Posts</h1>
                     <div class="admin-topbar-actions">
-                        <select class="form-select" id="posts-filter" style="width:160px;">
+                        <div class="search-bar-wrapper">
+                            <i data-lucide="search"></i>
+                            <input type="text" class="search-bar" id="posts-search" placeholder="Search posts...">
+                        </div>
+                        <select class="form-select" id="posts-filter" style="width:140px;">
                             <option value="all">All Status</option>
                             <option value="published">Published</option>
                             <option value="draft">Drafts</option>
                             <option value="archived">Archived</option>
                         </select>
-                        <button class="btn btn-primary btn-sm" onclick="showPage('new-post')">
+                        <button class="btn btn-primary btn-sm" onclick="resetEditor();showPage('new-post')">
                             <i data-lucide="plus" style="width:14px;height:14px;"></i> New Post
                         </button>
                     </div>
                 </div>
                 <div class="admin-content">
+                    <!-- Bulk Action Bar -->
+                    <div class="bulk-action-bar" id="bulk-action-bar">
+                        <span class="bulk-count" id="bulk-count">0</span> posts selected
+                        <button class="btn btn-sm" onclick="bulkPublish()"><i data-lucide="check"
+                                style="width:12px;height:12px;"></i> Publish</button>
+                        <button class="btn btn-sm" onclick="bulkDraft()"><i data-lucide="edit-3"
+                                style="width:12px;height:12px;"></i> Draft</button>
+                        <button class="btn btn-sm" onclick="bulkDelete()" style="border-color:rgba(255,100,100,0.5);"><i
+                                data-lucide="trash-2" style="width:12px;height:12px;"></i> Delete</button>
+                        <button class="btn btn-deselect btn-sm" onclick="deselectAll()">✕ Deselect</button>
+                    </div>
                     <div class="posts-table-wrapper">
                         <table class="posts-table">
                             <thead>
                                 <tr>
+                                    <th style="width:40px;"><input type="checkbox" class="bulk-checkbox"
+                                            id="select-all-posts" onchange="toggleSelectAll(this)"></th>
                                     <th>Title</th>
                                     <th>Author</th>
                                     <th>Category</th>
@@ -183,9 +218,13 @@
                             <!-- Title -->
                             <div class="editor-card">
                                 <input type="text" class="editor-title-input" id="editor-title"
-                                    placeholder="Post title...">
+                                    placeholder="Post title..." oninput="updateSlugPreview()">
                                 <input type="text" class="editor-subtitle-input" id="editor-subtitle"
                                     placeholder="Subtitle or tagline...">
+                                <div class="slug-preview" id="slug-preview">
+                                    <i data-lucide="link" style="width:14px;height:14px;flex-shrink:0;"></i>
+                                    <span>Slug:</span> <code id="slug-text">—</code>
+                                </div>
                             </div>
 
                             <!-- Content -->
@@ -227,8 +266,17 @@
                                 </div>
 
                                 <textarea class="markdown-editor" id="markdown-editor"
-                                    placeholder="Write your article in Markdown..."></textarea>
+                                    placeholder="Write your article in Markdown..."
+                                    oninput="updateWordCount()"></textarea>
                                 <div class="markdown-preview" id="markdown-preview"></div>
+                                <div class="editor-meta-bar" id="editor-meta-bar">
+                                    <span><i data-lucide="type" style="width:13px;height:13px;"></i> <span
+                                            id="word-count">0</span> words</span>
+                                    <span><i data-lucide="clock" style="width:13px;height:13px;"></i> ~<span
+                                            id="auto-read-time">0</span> min read</span>
+                                    <span><i data-lucide="hash" style="width:13px;height:13px;"></i> <span
+                                            id="char-count">0</span> chars</span>
+                                </div>
                             </div>
                         </div>
 
@@ -355,6 +403,21 @@
                 </div>
             </div>
 
+            <!-- ─── Activity Log Page ─── -->
+            <div class="admin-page" id="page-activity" style="display:none;">
+                <div class="admin-topbar">
+                    <h1>Activity Log</h1>
+                </div>
+                <div class="admin-content">
+                    <div class="editor-card">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list" id="activity-list">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -418,6 +481,9 @@
             editingPostId: null,
             editorTags: [],
             isFeatured: false,
+            selectedPosts: new Set(),
+            searchQuery: '',
+            activityLog: [],
         };
 
         // ─── Init ───
@@ -444,9 +510,38 @@
             setupLoginForm();
             setupLogout();
             setupSidebarNav();
+            setupMobileSidebar();
             setupPostsFilter();
+            setupPostsSearch();
             setupTagsInput();
             setupThumbnailPreview();
+        }
+
+        // ─── Mobile Sidebar ───
+        function setupMobileSidebar() {
+            const toggle = document.getElementById('mobile-sidebar-toggle');
+            const sidebar = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    overlay.classList.toggle('active');
+                });
+            }
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                });
+            }
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
         }
 
         // ─── Auth ───
@@ -526,6 +621,7 @@
                         resetEditor();
                     }
                     showPage(link.dataset.page);
+                    closeMobileSidebar();
                 });
             });
         }
@@ -547,9 +643,10 @@
             switch (page) {
                 case 'dashboard': loadDashboard(); break;
                 case 'posts': loadAllPosts(); break;
-                case 'new-post': break; // Don't reset editor here, to allow edit mode
+                case 'new-post': break;
                 case 'categories': loadCategories(); break;
                 case 'users': loadUsers(); break;
+                case 'activity': loadActivityLog(); break;
             }
 
             lucide.createIcons();
@@ -568,6 +665,7 @@
             const published = posts?.filter(p => p.status === 'published').length || 0;
             const drafts = posts?.filter(p => p.status === 'draft').length || 0;
             const total = posts?.length || 0;
+            const totalViews = posts?.reduce((sum, p) => sum + (p.views || 0), 0) || 0;
 
             // Load categories
             const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
@@ -597,13 +695,13 @@
         </div>
         <div class="stat-card">
           <div class="stat-card-header">
-            <span>Drafts</span>
-            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--admin-yellow);">
-              <i data-lucide="edit-3" style="width:18px;height:18px;"></i>
+            <span>Total Views</span>
+            <div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">
+              <i data-lucide="eye" style="width:18px;height:18px;"></i>
             </div>
           </div>
-          <div class="stat-value">${drafts}</div>
-          <div class="stat-label">In progress</div>
+          <div class="stat-value">${totalViews.toLocaleString()}</div>
+          <div class="stat-label">All-time page views</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-header">
@@ -645,15 +743,28 @@
 
             const { data: posts } = await query;
             adminState.posts = posts || [];
+            adminState.selectedPosts.clear();
+            updateBulkBar();
 
-            if (!posts || posts.length === 0) {
+            // Apply search filter client-side
+            let filtered = posts || [];
+            if (adminState.searchQuery) {
+                const q = adminState.searchQuery.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.title.toLowerCase().includes(q) ||
+                    (p.author_name && p.author_name.toLowerCase().includes(q)) ||
+                    (p.category_id && p.category_id.toLowerCase().includes(q))
+                );
+            }
+
+            if (filtered.length === 0) {
                 document.getElementById('all-posts-body').innerHTML = `
-          <tr><td colspan="6">
+          <tr><td colspan="7">
             <div class="empty-state">
               <i data-lucide="file-text" style="width:48px;height:48px;display:block;margin:0 auto;"></i>
-              <h3>No posts yet</h3>
-              <p>Create your first post to get started.</p>
-              <button class="btn btn-primary btn-sm" onclick="showPage('new-post')">Create Post</button>
+              <h3>No posts found</h3>
+              <p>${adminState.searchQuery ? 'Try a different search term.' : 'Create your first post to get started.'}</p>
+              ${!adminState.searchQuery ? '<button class="btn btn-primary btn-sm" onclick="resetEditor();showPage(\'new-post\')">Create Post</button>' : ''}
             </div>
           </td></tr>
         `;
@@ -661,10 +772,11 @@
                 return;
             }
 
-            document.getElementById('all-posts-body').innerHTML = posts.map(post => `
+            document.getElementById('all-posts-body').innerHTML = filtered.map(post => `
         <tr>
+          <td><input type="checkbox" class="bulk-checkbox post-checkbox" data-id="${post.id}" onchange="togglePostSelect('${post.id}', this)" ${adminState.selectedPosts.has(post.id) ? 'checked' : ''}></td>
           <td class="post-row-title">${post.title}</td>
-          <td style="color:var(--admin-text-muted);">${post.author_name}</td>
+          <td style="color:var(--admin-text-muted);">${post.author_name || '—'}</td>
           <td>${post.category_id}</td>
           <td><span class="status-badge status-${post.status}">${post.status}</span></td>
           <td style="color:var(--admin-text-muted);">${new Date(post.date).toLocaleDateString()}</td>
@@ -690,6 +802,91 @@
             });
         }
 
+        function setupPostsSearch() {
+            const searchInput = document.getElementById('posts-search');
+            if (!searchInput) return;
+            let debounce;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => {
+                    adminState.searchQuery = searchInput.value.trim();
+                    const filter = document.getElementById('posts-filter').value;
+                    loadAllPosts(filter);
+                }, 300);
+            });
+        }
+
+        // ─── Bulk Actions ───
+        function togglePostSelect(id, checkbox) {
+            if (checkbox.checked) {
+                adminState.selectedPosts.add(id);
+            } else {
+                adminState.selectedPosts.delete(id);
+            }
+            updateBulkBar();
+        }
+
+        function toggleSelectAll(checkbox) {
+            const boxes = document.querySelectorAll('.post-checkbox');
+            boxes.forEach(b => {
+                b.checked = checkbox.checked;
+                if (checkbox.checked) adminState.selectedPosts.add(b.dataset.id);
+                else adminState.selectedPosts.delete(b.dataset.id);
+            });
+            updateBulkBar();
+        }
+
+        function deselectAll() {
+            adminState.selectedPosts.clear();
+            document.querySelectorAll('.post-checkbox').forEach(b => b.checked = false);
+            const selectAll = document.getElementById('select-all-posts');
+            if (selectAll) selectAll.checked = false;
+            updateBulkBar();
+        }
+
+        function updateBulkBar() {
+            const bar = document.getElementById('bulk-action-bar');
+            const count = document.getElementById('bulk-count');
+            if (!bar) return;
+            if (adminState.selectedPosts.size > 0) {
+                bar.classList.add('active');
+                count.textContent = adminState.selectedPosts.size;
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+
+        async function bulkPublish() {
+            for (const id of adminState.selectedPosts) {
+                await supabase.from('posts').update({ status: 'published' }).eq('id', id);
+            }
+            toast(`${adminState.selectedPosts.size} posts published!`, 'success');
+            logActivity('publish', `Bulk published ${adminState.selectedPosts.size} posts`, 'post');
+            deselectAll();
+            loadAllPosts(document.getElementById('posts-filter').value);
+        }
+
+        async function bulkDraft() {
+            for (const id of adminState.selectedPosts) {
+                await supabase.from('posts').update({ status: 'draft' }).eq('id', id);
+            }
+            toast(`${adminState.selectedPosts.size} posts moved to drafts.`, 'success');
+            logActivity('update', `Bulk drafted ${adminState.selectedPosts.size} posts`, 'post');
+            deselectAll();
+            loadAllPosts(document.getElementById('posts-filter').value);
+        }
+
+        async function bulkDelete() {
+            if (!confirm(`Delete ${adminState.selectedPosts.size} posts? This cannot be undone.`)) return;
+            for (const id of adminState.selectedPosts) {
+                await supabase.from('posts').delete().eq('id', id);
+            }
+            toast(`${adminState.selectedPosts.size} posts deleted.`, 'success');
+            logActivity('delete', `Bulk deleted ${adminState.selectedPosts.size} posts`, 'post');
+            deselectAll();
+            loadAllPosts(document.getElementById('posts-filter').value);
+        }
+
         // ─── Post Editor ───
         function resetEditor() {
             adminState.editingPostId = null;
@@ -707,6 +904,8 @@
             document.getElementById('editor-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('featured-toggle').classList.remove('active');
             document.getElementById('thumbnail-preview').style.display = 'none';
+            if (document.getElementById('slug-text')) document.getElementById('slug-text').textContent = '—';
+            updateWordCount();
 
             renderTagChips();
             loadCategorySelect();
@@ -785,18 +984,23 @@
 
             const profile = adminState.profile || {};
             const id = adminState.editingPostId || generateSlug(title);
+            const content = document.getElementById('markdown-editor').value;
+            const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+            const autoReadTime = Math.max(1, Math.ceil(words / 200));
+            const manualReadTime = document.getElementById('editor-readtime').value.trim();
 
             return {
                 id,
                 title,
+                slug: generateSlug(title),
                 subtitle: document.getElementById('editor-subtitle').value.trim(),
-                content: document.getElementById('markdown-editor').value,
+                content,
                 excerpt: document.getElementById('editor-excerpt').value.trim(),
                 category_id: document.getElementById('editor-category').value,
                 tags: adminState.editorTags,
                 thumbnail: document.getElementById('editor-thumbnail').value.trim(),
                 media_url: document.getElementById('editor-media-url').value.trim() || null,
-                read_time: document.getElementById('editor-readtime').value.trim() || '5 min read',
+                read_time: manualReadTime || `${autoReadTime} min read`,
                 date: document.getElementById('editor-date').value,
                 status,
                 featured: adminState.isFeatured,
@@ -839,6 +1043,13 @@
                 adminState.editingPostId ? 'Post updated successfully!' : 'Post created successfully!',
                 'success'
             );
+
+            // Log activity
+            if (adminState.editingPostId) {
+                logActivity('update', `Updated post: "${data.title}"`, 'post', data.id, data.title);
+            } else {
+                logActivity('create', `Created post: "${data.title}" (${data.status})`, 'post', data.id, data.title);
+            }
 
             // Go to posts list
             setTimeout(() => showPage('posts'), 500);
@@ -1107,6 +1318,7 @@
 
         document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
             if (!deleteTargetId) return;
+            const post = adminState.posts.find(p => p.id === deleteTargetId);
             const { error } = await supabase.from('posts').delete().eq('id', deleteTargetId);
             closeDeleteModal();
 
@@ -1114,9 +1326,127 @@
                 toast(`Error: ${error.message}`, 'error');
             } else {
                 toast('Post deleted.', 'success');
+                logActivity('delete', `Deleted post: "${post?.title || deleteTargetId}"`, 'post', deleteTargetId, post?.title || '');
                 loadAllPosts();
             }
         });
+
+        // ─── Word Count & Read Time ───
+        function updateWordCount() {
+            const text = (document.getElementById('markdown-editor')?.value || '').trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            const chars = text.length;
+            const readMin = Math.max(1, Math.ceil(words / 200));
+
+            const wordEl = document.getElementById('word-count');
+            const charEl = document.getElementById('char-count');
+            const readEl = document.getElementById('auto-read-time');
+            if (wordEl) wordEl.textContent = words;
+            if (charEl) charEl.textContent = chars;
+            if (readEl) readEl.textContent = readMin;
+        }
+
+        // ─── Slug Preview ───
+        function updateSlugPreview() {
+            const title = (document.getElementById('editor-title')?.value || '').trim();
+            const slugEl = document.getElementById('slug-text');
+            if (!slugEl) return;
+            if (!title) { slugEl.textContent = '—'; return; }
+            const slug = title.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substring(0, 60);
+            slugEl.textContent = slug || '—';
+        }
+
+        // ─── Activity Log (Supabase-backed) ───
+        async function logActivity(action, message, entityType = 'post', entityId = '', entityTitle = '') {
+            const entry = {
+                user_id: adminState.user?.id || null,
+                user_name: adminState.profile?.full_name || 'Unknown',
+                action: action === 'edit' ? 'update' : action,
+                entity_type: entityType,
+                entity_id: entityId,
+                entity_title: entityTitle,
+                details: message,
+            };
+
+            // Also keep in local state for immediate UI
+            adminState.activityLog.unshift({
+                ...entry,
+                created_at: new Date().toISOString()
+            });
+
+            // Persist to Supabase
+            try {
+                await supabase.from('activity_logs').insert(entry);
+            } catch (e) {
+                console.warn('Failed to log activity:', e);
+            }
+        }
+
+        async function loadActivityLog() {
+            const list = document.getElementById('activity-list');
+            if (!list) return;
+
+            // Fetch from Supabase
+            try {
+                const { data, error } = await supabase
+                    .from('activity_logs')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (!error && data) {
+                    adminState.activityLog = data;
+                }
+            } catch (e) {
+                console.warn('Failed to load activity log:', e);
+            }
+
+            if (adminState.activityLog.length === 0) {
+                list.innerHTML = '<div class="empty-state"><p>No activity recorded yet.</p></div>';
+                return;
+            }
+
+            const iconMap = {
+                publish: { icon: 'check-circle', cls: 'publish' },
+                update: { icon: 'edit-2', cls: 'edit' },
+                delete: { icon: 'trash-2', cls: 'delete' },
+                create: { icon: 'plus-circle', cls: 'create' },
+                archive: { icon: 'archive', cls: 'edit' },
+                login: { icon: 'log-in', cls: 'create' },
+            };
+
+            list.innerHTML = adminState.activityLog.map(entry => {
+                const ic = iconMap[entry.action] || iconMap.update;
+                const timeAgo = getTimeAgo(new Date(entry.created_at));
+                return `
+                <div class="activity-item">
+                    <div class="activity-icon ${ic.cls}">
+                        <i data-lucide="${ic.icon}" style="width:16px;height:16px;"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div><strong>${entry.user_name}</strong> ${entry.details}</div>
+                        <div class="activity-time">${timeAgo}</div>
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
 
         // ─── Toast ───
         function toast(message, type = 'info') {
