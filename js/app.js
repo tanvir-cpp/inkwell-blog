@@ -261,7 +261,7 @@
 
     // Increment view count in Supabase (fire and forget)
     if (state.useSupabase) {
-      supabase.rpc('increment_views', { post_id: post.id }).catch(() => { });
+      supabase.rpc('increment_views', { post_id: post.id }).then(() => { }, () => { });
     }
 
     // Update post header

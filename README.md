@@ -26,6 +26,7 @@
 ## ✨ Features
 
 ### 📖 Public Blog
+
 - **Hero Section** — Eye-catching landing with featured article highlights
 - **Category Navigation** — Browse posts by Coding, Design, Travel, Tech, and Resources
 - **Full-Text Search** — Instant search with `Ctrl+K` keyboard shortcut
@@ -38,6 +39,7 @@
 - **Scroll Reveal Animations** — Smooth entrance animations on scroll
 
 ### 🔧 Admin Panel (`admin.html`)
+
 - **Secure Authentication** — Email/password login via Supabase Auth
 - **Dashboard** — Stats overview with total posts, views, published count, and categories
 - **Post Management** — Create, edit, publish, draft, archive, and delete posts
@@ -49,6 +51,7 @@
 - **Mobile-Friendly** — Full responsive admin layout with collapsible sidebar
 
 ### 🛠️ Technical Highlights
+
 - **Zero Framework** — Pure HTML/CSS/JS, no build step required
 - **Supabase Backend** — Postgres database, Auth, and real-time capabilities
 - **Lucide Icons** — Beautiful, consistent icon set throughout the UI
@@ -150,6 +153,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 👤 Author
 
 **Tanvir Ahmed**
+
 - GitHub: [@tanvir-cpp](https://github.com/tanvir-cpp)
 
 ---
