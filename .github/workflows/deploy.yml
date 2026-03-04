@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -26,13 +26,13 @@ jobs:
 
       - name: Generate env.js from secrets
         run: |
-          cat > js/env.js << EOF
+          cat > js/env.js << 'ENVEOF'
           // Auto-generated during deployment
           window.ENV = {
               SUPABASE_URL: "${{ secrets.SUPABASE_URL }}",
               SUPABASE_ANON_KEY: "${{ secrets.SUPABASE_ANON_KEY }}"
           };
-          EOF
+          ENVEOF
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
